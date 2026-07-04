@@ -428,3 +428,406 @@ body {
     padding: 1rem;
   }
 }
+/* Tags */
+.photo-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 6px 0;
+  align-items: center;
+}
+
+.tags-icon {
+  font-size: 12px;
+  color: #7f8c8d;
+  margin-right: 4px;
+}
+
+.tag-item {
+  display: inline-block;
+  background: #3498db;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.edit-tags-btn {
+  background: none;
+  border: none;
+  color: #95a5a6;
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 11px;
+  transition: color 0.3s;
+}
+
+.edit-tags-btn:hover {
+  color: #3498db;
+}
+
+/* Tag Filter */
+.tag-filter {
+  background: white;
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.tag-filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.tag-filter-header h3 {
+  font-size: 14px;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.clear-tags-btn {
+  background: none;
+  border: none;
+  color: #e74c3c;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.clear-tags-btn:hover {
+  text-decoration: underline;
+}
+
+.tag-filter-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag-filter-item {
+  padding: 4px 12px;
+  border-radius: 16px;
+  border: 1px solid #bdc3c7;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  color: #2c3e50;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tag-filter-item:hover {
+  border-color: #3498db;
+  background: #ebf5fb;
+}
+
+.tag-filter-item.active {
+  background: #3498db;
+  color: white;
+  border-color: #3498db;
+}
+
+.remove-icon {
+  font-size: 10px;
+}
+
+.tag-filter-loading,
+.tag-filter-empty {
+  color: #95a5a6;
+  font-size: 13px;
+  padding: 8px 0;
+}
+
+/* Gallery Header */
+.gallery-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-info {
+  background: #ebf5fb;
+  color: #2c3e50;
+  padding: 2px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+/* Edit Tags Modal */
+.edit-tags-modal {
+  max-width: 400px;
+  padding: 24px;
+}
+
+.edit-tags-modal h3 {
+  margin-bottom: 16px;
+  color: #2c3e50;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  justify-content: flex-end;
+}
+
+.cancel-btn {
+  padding: 8px 16px;
+  background: #ecf0f1;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #2c3e50;
+}
+
+.cancel-btn:hover {
+  background: #d5dbdb;
+}
+
+.save-btn {
+  padding: 8px 16px;
+  background: #3498db;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: white;
+}
+
+.save-btn:hover {
+  background: #2980b9;
+}
+
+.cancel-btn:disabled,
+.save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.modal-tags {
+  margin: 8px 0;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.modal-tags strong {
+  margin-right: 4px;
+}
+
+/* Advanced Filter */
+.advanced-filter {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #2c3e50;
+}
+
+.filter-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filter-count {
+  font-size: 13px;
+  color: #7f8c8d;
+}
+
+.clear-all-btn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.clear-all-btn:hover {
+  background: #c0392b;
+}
+
+.filter-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-section {
+  border: 1px solid #ecf0f1;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.filter-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  cursor: pointer;
+  background: #f8f9fa;
+  transition: background 0.2s;
+}
+
+.filter-section-header:hover {
+  background: #ecf0f1;
+}
+
+.section-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selected-count {
+  font-size: 12px;
+  color: #3498db;
+  background: #ebf5fb;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.clear-section-btn {
+  background: none;
+  border: none;
+  color: #95a5a6;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.clear-section-btn:hover {
+  color: #e74c3c;
+}
+
+.filter-items {
+  padding: 10px 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filter-item {
+  padding: 4px 12px;
+  border-radius: 14px;
+  border: 1px solid #bdc3c7;
+  background: white;
+  cursor: pointer;
+  font-size: 12px;
+  color: #2c3e50;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.filter-item:hover {
+  border-color: #3498db;
+  background: #ebf5fb;
+}
+
+.filter-item.active {
+  background: #3498db;
+  color: white;
+  border-color: #3498db;
+}
+
+.filter-item .remove-icon {
+  margin-left: 2px;
+}
+
+.filter-loading,
+.filter-empty {
+  padding: 16px;
+  text-align: center;
+  color: #95a5a6;
+  font-size: 14px;
+}
+
+/* Gallery Controls */
+.gallery-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.sort-controls label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #2c3e50;
+}
+
+.sort-controls select {
+  padding: 4px 8px;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  background: white;
+  font-size: 13px;
+}
+
+.filter-badge {
+  background: #3498db;
+  color: white;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .filter-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-actions {
+    justify-content: space-between;
+  }
+  
+  .filter-section-header {
+    font-size: 14px;
+  }
+  
+  .filter-item {
+    font-size: 11px;
+    padding: 3px 10px;
+  }
+  
+  .gallery-controls {
+    flex-wrap: wrap;
+  }
+  
+  .sort-controls label {
+    font-size: 12px;
+  }
+}

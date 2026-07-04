@@ -4,7 +4,6 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs-extra');
 const { v4: uuidv4 } = require('uuid');
-const db = require('./database');
 require('dotenv').config();
 
 const app = express();
@@ -13,6 +12,31 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
+
+const DATA_FILE = path.join(__dirname, 'data.json');
+
+function loadPhotos() {
+  try {
+    if (fs.existsSync(DATA_FILE)) {
+      const data = fs.readFileSync(DATA_FILE, 'utf8');
+      return JSON.parse(data);
+    }
+  } catch (error) {
+    console.error('Error loading photos:', error);
+  }
+  return [];
+}
+
+function savePhotos(photos) {
+  try {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(photos, null, 2));
+  } catch (error) {
+    console.error('Error saving photos:', error);
+  }
+}
+
+let photos = loadPhotos();
+console.log(`📸 Loaded ${photos.length} photos from storage`);
 
 const uploadsDir = path.join(__dirname, 'uploads');
 fs.ensureDirSync(uploadsDir);
@@ -47,13 +71,7 @@ const upload = multer({
 
 // API маршруты
 app.get('/api/photos', (req, res) => {
-  db.all('SELECT * FROM photos ORDER BY uploadedAt DESC', (err, rows) => {
-    if (err) {
-      console.error('Error fetching photos:', err);
-      return res.status(500).json({ error: 'Failed to fetch photos' });
-    }
-    res.json(rows);
-  });
+  res.json(photos);
 });
 
 app.post('/api/photos', upload.single('photo'), (req, res) => {
@@ -62,6 +80,8 @@ app.post('/api/photos', upload.single('photo'), (req, res) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
+    const tags = (req.body.tags || '').split(',').map(t => t.trim()).filter(t => t.length > 0);
+    
     const photo = {
       id: uuidv4(),
       filename: req.file.filename,
@@ -69,27 +89,18 @@ app.post('/api/photos', upload.single('photo'), (req, res) => {
       path: `/uploads/${req.file.filename}`,
       title: req.body.title || 'Untitled',
       description: req.body.description || '',
+      tags: tags,
+      category: req.body.category || 'other',
+      location: req.body.location || '',
+      event: req.body.event || '',
       uploadedAt: new Date().toISOString(),
       size: req.file.size,
       mimetype: req.file.mimetype
     };
 
-    db.run(
-      `INSERT INTO photos (id, filename, originalName, path, title, description, uploadedAt, size, mimetype)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        photo.id, photo.filename, photo.originalName, photo.path,
-        photo.title, photo.description, photo.uploadedAt,
-        photo.size, photo.mimetype
-      ],
-      (err) => {
-        if (err) {
-          console.error('Error saving photo:', err);
-          return res.status(500).json({ error: 'Failed to save photo' });
-        }
-        res.status(201).json(photo);
-      }
-    );
+    photos.unshift(photo);
+    savePhotos(photos);
+    res.status(201).json(photo);
   } catch (error) {
     console.error('Upload error:', error);
     res.status(500).json({ error: 'Failed to upload photo' });
@@ -97,45 +108,85 @@ app.post('/api/photos', upload.single('photo'), (req, res) => {
 });
 
 app.delete('/api/photos/:id', async (req, res) => {
-  const photoId = req.params.id;
-  
-  // Сначала получаем информацию о фото
-  db.get('SELECT * FROM photos WHERE id = ?', [photoId], async (err, photo) => {
-    if (err || !photo) {
+  try {
+    const photoId = req.params.id;
+    const photoIndex = photos.findIndex(p => p.id === photoId);
+    
+    if (photoIndex === -1) {
       return res.status(404).json({ error: 'Photo not found' });
     }
 
-    try {
-      // Удаляем файл
-      const filePath = path.join(__dirname, photo.path);
-      if (fs.existsSync(filePath)) {
-        await fs.unlink(filePath);
-      }
-
-      // Удаляем из базы данных
-      db.run('DELETE FROM photos WHERE id = ?', [photoId], (err) => {
-        if (err) {
-          console.error('Error deleting photo:', err);
-          return res.status(500).json({ error: 'Failed to delete photo' });
-        }
-        res.json({ message: 'Photo deleted successfully' });
-      });
-    } catch (error) {
-      console.error('Delete error:', error);
-      res.status(500).json({ error: 'Failed to delete photo' });
+    const photo = photos[photoIndex];
+    const filePath = path.join(__dirname, photo.path);
+    
+    if (fs.existsSync(filePath)) {
+      await fs.unlink(filePath);
     }
-  });
+    
+    photos.splice(photoIndex, 1);
+    savePhotos(photos);
+    res.json({ message: 'Photo deleted successfully' });
+  } catch (error) {
+    console.error('Delete error:', error);
+    res.status(500).json({ error: 'Failed to delete photo' });
+  }
 });
 
-app.get('/api/photos/:id', (req, res) => {
-  db.get('SELECT * FROM photos WHERE id = ?', [req.params.id], (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: 'Database error' });
-    }
-    if (!row) {
+app.put('/api/photos/:id', (req, res) => {
+  try {
+    const photoId = req.params.id;
+    const photoIndex = photos.findIndex(p => p.id === photoId);
+    
+    if (photoIndex === -1) {
       return res.status(404).json({ error: 'Photo not found' });
     }
-    res.json(row);
+    
+    const updatedPhoto = {
+      ...photos[photoIndex],
+      ...req.body,
+      tags: (req.body.tags || '').split(',').map(t => t.trim()).filter(t => t.length > 0)
+    };
+    
+    photos[photoIndex] = updatedPhoto;
+    savePhotos(photos);
+    res.json(updatedPhoto);
+  } catch (error) {
+    console.error('Error updating photo:', error);
+    res.status(500).json({ error: 'Failed to update photo' });
+  }
+});
+
+// Получить все уникальные значения для фильтров
+app.get('/api/filters', (req, res) => {
+  const filters = {
+    tags: new Set(),
+    categories: new Set(),
+    locations: new Set(),
+    events: new Set(),
+    years: new Set(),
+    months: new Set()
+  };
+  
+  photos.forEach(photo => {
+    if (photo.tags) photo.tags.forEach(tag => filters.tags.add(tag));
+    if (photo.category) filters.categories.add(photo.category);
+    if (photo.location) filters.locations.add(photo.location);
+    if (photo.event) filters.events.add(photo.event);
+    
+    if (photo.uploadedAt) {
+      const date = new Date(photo.uploadedAt);
+      filters.years.add(date.getFullYear());
+      filters.months.add(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`);
+    }
+  });
+  
+  res.json({
+    tags: [...filters.tags],
+    categories: [...filters.categories],
+    locations: [...filters.locations],
+    events: [...filters.events],
+    years: [...filters.years].sort(),
+    months: [...filters.months].sort()
   });
 });
 
@@ -153,5 +204,5 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
   console.log(`📁 Uploads folder: ${uploadsDir}`);
-  console.log(`🗄️  Database: photos.db`);
+  console.log(`📸 Photos in storage: ${photos.length}`);
 });

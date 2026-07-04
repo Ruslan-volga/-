@@ -22,7 +22,6 @@ function App() {
     try {
       setLoading(true);
       const response = await axios.get(`${API_URL}/photos`);
-      console.log('Fetched photos:', response.data);
       setPhotos(response.data);
     } catch (error) {
       console.error('Error fetching photos:', error);
@@ -34,11 +33,7 @@ function App() {
 
   const handleUpload = async (photoData) => {
     try {
-      console.log('Upload response:', photoData);
-      
-      // Проверяем, что photoData содержит правильные данные
       if (photoData && photoData.id) {
-        // Добавляем фото в начало списка
         setPhotos(prev => [photoData, ...prev]);
         toast.success('Photo uploaded successfully!');
         setActiveTab('gallery');
@@ -66,6 +61,13 @@ function App() {
     }
   };
 
+  const handleUpdateTags = (updatedPhoto) => {
+    setPhotos(prev => prev.map(photo => 
+      photo.id === updatedPhoto.id ? updatedPhoto : photo
+    ));
+    toast.success('Tags updated successfully!');
+  };
+
   return (
     <div className="App">
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -76,6 +78,7 @@ function App() {
             photos={photos} 
             loading={loading} 
             onDelete={handleDelete}
+            onUpdateTags={handleUpdateTags}
           />
         )}
         
